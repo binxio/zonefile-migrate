@@ -7,7 +7,6 @@ build:
 
 test:
 	python setup.py test
-	python setup.py test
 
 release: test build
 	twine upload dist/*

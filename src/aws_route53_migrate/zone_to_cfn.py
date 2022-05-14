@@ -18,7 +18,7 @@ def logical_resource_id(name: str):
     create a CloudFormation logical resource id for `name`, ignoring non letters or digits.
 
     >>> logical_resource_id('asample.org')
-    'ExampleOrg'
+    'AsampleOrg'
     >>> logical_resource_id('v-r-v.com')
     'VRVCom'
     >>> logical_resource_id('chapter9.com')
@@ -38,7 +38,7 @@ def generate_unique_logical_resource_id(prefix: str, resources: dict) -> str:
     >>> generate_unique_logical_resource_id('key', {'key': 'value'})
     'key1'
     >>> generate_unique_logical_resource_id('key', {'key': 'value', 'key1': 'value1'})
-    'key4'
+    'key2'
     """
     same_prefix = set(filter(lambda n: n.startswith(prefix), resources.keys()))
     if not same_prefix:
