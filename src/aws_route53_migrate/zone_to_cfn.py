@@ -38,7 +38,7 @@ def generate_unique_logical_resource_id(prefix: str, resources: dict) -> str:
     >>> generate_unique_logical_resource_id('key', {'key': 'value'})
     'key1'
     >>> generate_unique_logical_resource_id('key', {'key': 'value', 'key1': 'value1'})
-    'key2'
+    'key4'
     """
     same_prefix = set(filter(lambda n: n.startswith(prefix), resources.keys()))
     if not same_prefix:

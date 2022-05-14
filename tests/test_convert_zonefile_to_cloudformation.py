@@ -97,5 +97,6 @@ class ConvertToCloudFormationTestCase(unittest.TestCase):
             self.assertEqual(expected_resource_records, properties["ResourceRecords"])
         self.assertEqual(expected_nr_of_records, nr_of_records)
 
+
 if __name__ == "__main__":
     unittest.main()

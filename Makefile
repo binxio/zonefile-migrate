@@ -2,13 +2,14 @@
 build:
 	python setup.py check
 	python setup.py build
+	rm -rf dist/*
+	python setup.py sdist
 
 test:
 	python setup.py test
+	python setup.py test
 
-release:
-	rm -rf dist/*
-	python setup.py sdist
+release: test build
 	twine upload dist/*
 
 clean:
