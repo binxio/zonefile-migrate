@@ -1,0 +1,16 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+twine = "*"
+pylint = "*"
+black = "*"
+sceptre = "*"
+
+[packages]
+aws_route53_migrate = {editable = true, path = "."}
+
+[requires]
+python_version = "3.9"
