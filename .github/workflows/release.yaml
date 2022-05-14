@@ -5,7 +5,7 @@ on:
       - '*'
 jobs:
   build:
-    name: snapshot
+    name: release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -14,11 +14,13 @@ jobs:
           python-version: 3.9
       - name: checkout
         run: git fetch --prune --unshallow
-      - name: pipenv
+      - name: install environment
         run: pip install pipenv && pipenv sync -d 
-      - name: pipenv
+      - name: test
+        run: make test
+      - name: build
         run: make build
-      - name: distribute application
+      - name: upload to pypi
         uses: pypa/gh-action-pypi-publish@v1.1.0
         with:
           user: __token__
