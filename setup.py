@@ -11,13 +11,13 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='aws-route53-migrate',
+    name='zonefile-migrate',
     version="0.1.1",
-    url='https://github.com/binxio/aws-route53-migrate',
+    url='https://github.com/binxio/zonefile-migrate',
     license='BSD',
     author='Mark van Holsteijn',
     author_email='markvanholsteijn@binx.io',
-    description='utility to migrate DNS managed zones in route53',
+    description='utility to migrate DNS managed zones ',
     long_description=long_description,
     long_description_content_type='text/markdown',
     package_dir={'': 'src'},
@@ -31,7 +31,7 @@ setup(
     test_suite='tests',
     entry_points={
         'console_scripts': [
-            'aws-route53-migrate = aws_route53_migrate.__main__:main'
+            'zonefile-migrate = zonefile_migrate.__main__:main',
         ],
     },
     classifiers=[

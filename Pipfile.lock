@@ -20,7 +20,7 @@
             "editable": true,
             "path": "."
         },
-        "aws-route53-migrate": {
+        "zonefile-migrate": {
             "editable": true,
             "path": "."
         },

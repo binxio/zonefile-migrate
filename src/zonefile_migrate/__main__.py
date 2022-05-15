@@ -1,5 +1,5 @@
 import click
-from aws_route53_migrate.zone_to_cfn import command
+from zonefile_migrate.zone_to_cfn import command
 
 
 @click.group

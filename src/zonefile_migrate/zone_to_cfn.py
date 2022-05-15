@@ -8,7 +8,7 @@ import os
 from dns.rdatatype import _by_text as DNSRecordTypes
 from pathlib import Path
 from ruamel.yaml import YAML, CommentedMap
-from aws_route53_migrate.logger import logging
+from zonefile_migrate.logger import logging
 from easyzone import easyzone
 from dns.exception import SyntaxError
 

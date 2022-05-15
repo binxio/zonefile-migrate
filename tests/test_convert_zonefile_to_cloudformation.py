@@ -1,7 +1,7 @@
 import unittest
 import tempfile
 import os
-from aws_route53_migrate.zone_to_cfn import convert_to_cloudformation
+from zonefile_migrate.zone_to_cfn import convert_to_cloudformation
 from easyzone import easyzone
 
 

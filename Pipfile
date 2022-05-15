@@ -11,7 +11,7 @@ sceptre = "*"
 git-release-tag = "*"
 
 [packages]
-aws_route53_migrate = {editable = true, path = "."}
+zonefile_migrate = {editable = true, path = "."}
 
 [requires]
 python_version = "3.9"

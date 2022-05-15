@@ -1,9 +1,9 @@
 # Name
-aws-route53-migrate - Migrate Route53 managed zones
+zonefile-migrate - Migrate Route53 managed zones
 
 # Synopsis
 ```text
-aws-route53-migrate zone-to-cfn [OPTIONS] [SRC]... DST
+zonefile-migrate zone-to-cfn [OPTIONS] [SRC]... DST
 ```
 # Options
 ```
@@ -29,16 +29,16 @@ domain name.
 to install the utility, type:
 
 ```bash
-pip install aws-route53-migrate
+pip install zonefile-migrate
 ```
 
 # Example
 In the source code we have an example, to try it out, type:
 
 ```bash
-$ git clone   https://gitlab.com/binxio/aws-route53-migrate.git
-$ cd aws-route53-migrate/example
-$ aws-route53-migrate zone-to-cfn --sceptre-group config/dns ./zones ./templates/dns
+$ git clone   https://gitlab.com/binxio/zonefile-migrate.git
+$ cd zonefile-migrate/example
+$ zonefile-migrate zone-to-cfn --sceptre-group config/dns ./zones ./templates/dns
 INFO: reading zonefile zones/asample.org
 WARNING: ignoring NS records for origin asample.org.
 WARNING: ignoring SOA records for origin asample.org.

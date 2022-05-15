@@ -1,6 +1,6 @@
 import unittest
 import doctest
-from aws_route53_migrate import zone_to_cfn
+from zonefile_migrate import zone_to_cfn
 
 
 def load_tests(loader, tests, pattern):
