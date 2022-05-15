@@ -1,10 +1,10 @@
 import unittest
 import doctest
-from zonefile_migrate import zone_to_cfn
+from zonefile_migrate import to_cloudformation
 
 
 def load_tests(loader, tests, pattern):
     suite = unittest.TestSuite()
-    test = doctest.DocTestSuite(zone_to_cfn)
+    test = doctest.DocTestSuite(to_cloudformation)
     suite.addTest(test)
     return suite

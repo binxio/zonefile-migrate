@@ -6,7 +6,7 @@ build:
 	python setup.py sdist
 
 test:
-	python setup.py test
+	python3 -munittest tests/test*.py
 
 release: test build
 	twine upload dist/*

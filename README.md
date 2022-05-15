@@ -1,9 +1,9 @@
 # Name
-zonefile-migrate - Migrate Route53 managed zones
+zonefile-migrate - Migrate DNS managed zones
 
 # Synopsis
 ```text
-zonefile-migrate zone-to-cfn [OPTIONS] [SRC]... DST
+zonefile-migrate to-cloudformation [OPTIONS] [SRC]... DST
 ```
 # Options
 ```
@@ -38,7 +38,7 @@ In the source code we have an example, to try it out, type:
 ```bash
 $ git clone   https://gitlab.com/binxio/zonefile-migrate.git
 $ cd zonefile-migrate/example
-$ zonefile-migrate zone-to-cfn --sceptre-group config/dns ./zones ./templates/dns
+$ zonefile-migrate to-cloudformation --sceptre-group config/dns ./zones ./templates/dns
 INFO: reading zonefile zones/asample.org
 WARNING: ignoring NS records for origin asample.org.
 WARNING: ignoring SOA records for origin asample.org.

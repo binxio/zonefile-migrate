@@ -1,7 +1,7 @@
 import unittest
 import tempfile
 import os
-from zonefile_migrate.zone_to_cfn import convert_to_cloudformation
+from zonefile_migrate.to_cloudformation import convert_to_cloudformation
 from easyzone import easyzone
 
 

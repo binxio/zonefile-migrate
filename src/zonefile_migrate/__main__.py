@@ -1,11 +1,11 @@
 import click
-from zonefile_migrate.zone_to_cfn import command
+from zonefile_migrate.to_cloudformation import command
 
 
 @click.group
 def main():
     """
-    Migrate Route53 managed zones
+    Migrate DNS managed zones
     """
     pass
 

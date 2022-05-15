@@ -1,5 +1,4 @@
 import click
-from blockstack_zones import parse_zone_file
 import json
 import logging
 import re
@@ -216,7 +215,7 @@ def is_zonefile(path: Path) -> bool:
     return False
 
 
-@click.command(name="zone-to-cfn")
+@click.command(name="to-cloudformation")
 @click.option(
     "--sceptre-group",
     required=False,
