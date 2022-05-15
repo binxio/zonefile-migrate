@@ -6,7 +6,7 @@ build:
 	python setup.py sdist
 
 test:
-	python3 -munittest tests/test*.py
+	PYTHONPATH=./src python3 -munittest tests/test*.py
 
 release: test build
 	twine upload dist/*
