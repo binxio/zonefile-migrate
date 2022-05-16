@@ -12,7 +12,7 @@ jobs:
       -
         name: Get tag
         id: repository
-        run: echo ::set-output name=tag::${GITHUB_REF/refs\/(heads|tags)\//}
+        run: echo ::set-output name=tag::${GITHUB_REF/\/refs\/*\//}
       -
         name: Checkout
         uses: actions/checkout@v2
