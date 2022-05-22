@@ -6,6 +6,7 @@ build:
 	python setup.py sdist
 
 test:
+	PYTHONPATH=src python3 -munittest $(shell cd src ; grep -r -l '>>>' . | grep -v -e __pycache__ -e '\.py$$' )
 	python3 -munittest tests/test*.py
 
 release: test build
