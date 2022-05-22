@@ -89,7 +89,7 @@ class ConvertToCloudFormationTestCase(unittest.TestCase):
             expected_resource_records = list(
                 map(
                     lambda i: " ".join(map(lambda j: str(j), i))
-                    if isinstance(i, tuple)
+                    if isinstance(i, (list, tuple))
                     else i,
                     records.items,
                 )

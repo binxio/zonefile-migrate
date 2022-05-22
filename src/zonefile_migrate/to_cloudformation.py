@@ -1,15 +1,16 @@
 import click
-import json
-import logging
 import re
-import sys
-import os
-from dns.rdatatype import _by_text as DNSRecordTypes
+
 from pathlib import Path
 from ruamel.yaml import YAML, CommentedMap
-from zonefile_migrate.logger import logging
+from zonefile_migrate.logger import log
 from easyzone import easyzone
-from dns.exception import SyntaxError
+from zonefile_migrate.dns_record_set import create_from_zone
+from zonefile_migrate.utils import (
+    get_all_zonefiles_in_path,
+    convert_zonefiles,
+    target_file,
+)
 
 
 def logical_resource_id(name: str):
@@ -64,65 +65,47 @@ def convert_to_cloudformation(zone: easyzone.Zone) -> dict:
     )
     result["Resources"] = resources
 
-    for key, name in zone.names.items():
-        for rectype in DNSRecordTypes.keys():
-            records = name.records(rectype)
-            if not records:
-                continue
+    for record_set in create_from_zone(zone):
+        if record_set.rectype == "NS" and record_set.name == zone.domain:
+            log.debug("ignoring NS records for origin %s", zone.domain)
+            continue
+        if record_set.rectype == "SOA":
+            log.debug("ignoring SOA records for domain %s", record_set.name)
+            continue
 
-            if rectype == "NS" and key == zone.domain:
-                logging.warning("ignoring NS records for origin %s", key)
-                continue
-            if rectype == "SOA":
-                logging.warning("ignoring SOA records for origin %s", key)
-                continue
-
-            logical_name = generate_unique_logical_resource_id(
-                re.sub(
-                    r"[^0-9a-zA-Z]",
-                    "",
-                    logical_resource_id(
-                        re.sub(
-                            r"^\*",
-                            "wildcard",
-                            key.removesuffix("." + zone.domain)
-                            if key != "@"
-                            else "Origin",
-                        )
-                    ),
-                )
-                + records.type
-                + "Record",
-                resources,
+        logical_name = generate_unique_logical_resource_id(
+            re.sub(
+                r"[^0-9a-zA-Z]",
+                "",
+                logical_resource_id(
+                    re.sub(
+                        r"^\*",
+                        "wildcard",
+                        record_set.name.removesuffix("." + zone.domain)
+                        if record_set.name == zone.domain
+                        else "Origin",
+                    )
+                ),
             )
-            resource_records = records.items
-            if rectype == "MX":
-                resource_records = list(map(lambda r: f"{r[0]} {r[1]}", records.items))
+            + record_set.rectype
+            + "Record",
+            resources,
+        )
 
-            resources[logical_name] = CommentedMap(
-                {
-                    "Type": "AWS::Route53::RecordSet",
-                    "Properties": {
-                        "Name": key,
-                        "Type": records.type,
-                        "ResourceRecords": resource_records,
-                        "TTL": name.ttl,
-                        "HostedZoneId": {"Ref": "HostedZone"},
-                    },
-                }
-            )
+        resources[logical_name] = CommentedMap(
+            {
+                "Type": "AWS::Route53::RecordSet",
+                "Properties": {
+                    "Name": record_set.name,
+                    "Type": record_set.rectype,
+                    "ResourceRecords": record_set.rrdatas,
+                    "TTL": record_set.ttl,
+                    "HostedZoneId": {"Ref": "HostedZone"},
+                },
+            }
+        )
 
     return result
-
-
-def target_file(src: Path, dst: Path) -> Path:
-    if dst.is_file():
-        return dst
-
-    if src.suffix == ".zone":
-        return dst.joinpath(src.name).with_suffix(".yaml")
-
-    return dst.joinpath(src.name + ".yaml")
 
 
 def common_parent(one: Path, other: Path) -> Path:
@@ -203,18 +186,6 @@ def generate_sceptre_configuration(
             YAML().dump(config, file)
 
 
-def is_zonefile(path: Path) -> bool:
-    """
-    returns true if the file pointed to by `path` contains a $ORIGIN or $TTL pragma, otherwise False
-    """
-    if path.exists() and path.is_file():
-        with path.open("r") as file:
-            for line in file:
-                if re.search(r"^\s*\$(ORIGIN|TTL)\s+", line, re.IGNORECASE):
-                    return True
-    return False
-
-
 @click.command(name="to-cloudformation")
 @click.option(
     "--sceptre-group",
@@ -237,8 +208,6 @@ def command(sceptre_group, src, dst):
     The zonefiles must contain a $ORIGIN and $TTL statement. If the SRC points to a directory
     all files which contain one of these statements will be converted. If a $ORIGIN is missing,
     the name of the file will be used as the domain name.
-
-
     """
     if sceptre_group:
         sceptre_group = Path(sceptre_group)
@@ -246,17 +215,10 @@ def command(sceptre_group, src, dst):
     if not src:
         raise click.UsageError("no source files were specified")
 
-    inputs = []
-    for filename in map(lambda s: Path(s), src):
-        if filename.is_dir():
-            inputs.extend(
-                [f for f in filename.iterdir() if f.is_file() and is_zonefile(f)]
-            )
-        else:
-            inputs.append(filename)
+    inputs = get_all_zonefiles_in_path(src)
 
     if len(inputs) == 0:
-        click.UsageError("no zone files were found")
+        click.UsageError("no zonefiles were found")
 
     dst = Path(dst)
     if len(inputs) > 1:
@@ -265,37 +227,15 @@ def command(sceptre_group, src, dst):
         if not dst.exists():
             dst.mkdir(parents=True, exist_ok=True)
 
-    outputs = list(map(lambda d: target_file(d, dst), inputs))
+    outputs = list(map(lambda d: target_file(d, dst, ".yaml"), inputs))
 
-    for i, input in enumerate(map(lambda s: Path(s), inputs)):
-        with input.open("r") as file:
-            content = file.read()
-            found = re.search(
-                r"\$ORIGIN\s+(?P<domain_name>.*)\s*",
-                content,
-                re.MULTILINE | re.IGNORECASE,
-            )
-            if found:
-                domain_name = found.group("domain_name")
-            else:
-                domain_name = input.name.removesuffix(".zone")
-                logging.warning(
-                    "could not find $ORIGIN from zone file %s, using %s",
-                    input,
-                    domain_name,
-                )
-
-            try:
-                logging.info("reading zonefile %s", input.as_posix())
-                zone = easyzone.zone_from_file(domain_name, input.as_posix())
-            except SyntaxError as error:
-                logging.error(error)
-                exit(1)
-
-        with outputs[i].open("w") as file:
+    def transform_to_cloudformation(zone: easyzone.Zone, output: Path):
+        with output.open("w") as file:
             YAML().dump(convert_to_cloudformation(zone), stream=file)
             if sceptre_group:
                 generate_sceptre_configuration(zone, outputs[i], sceptre_group)
+
+    convert_zonefiles(inputs, outputs, transform_to_cloudformation)
 
 
 if __name__ == "__main__":

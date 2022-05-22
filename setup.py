@@ -4,7 +4,7 @@ AWS Route53 control
 from os import path
 from setuptools import find_packages, setup
 
-dependencies = ['easyzone3', 'ruamel.yaml', 'click']
+dependencies = ['easyzone3', 'ruamel.yaml', 'Jinja2', 'click']
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
@@ -22,6 +22,7 @@ setup(
     long_description_content_type='text/markdown',
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
+    package_data={'': ['terraform-modules/*']},
     include_package_data=True,
     zip_safe=False,
     platforms='any',
