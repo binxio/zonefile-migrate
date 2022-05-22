@@ -18,7 +18,7 @@ from jinja2 import Template
 from zonefile_migrate.utils import get_all_zonefiles_in_path
 
 tf_managed_zone_template = """
-module {{ resource_name }} {
+module managed_zone_{{ resource_name }} {
   source               = "./{{ provider }}-managed-zone"
   domain_name          = "{{ domain_name }}"
   resource_record_sets = [{% for record in resource_record_sets %}
@@ -27,7 +27,7 @@ module {{ resource_name }} {
        type = "{{ record.rectype }}"
        ttl  = {{ record.ttl }}
        rrdatas = [{% for rrdata in record.rrdatas %}
-         "{{ rrdata }}",{% endfor %}       
+         "{{ rrdata.strip('"') }}",{% endfor %}
        ]
     },{% endfor %}
   ]
@@ -43,8 +43,9 @@ def convert_to_terraform(zone: easyzone.Zone, provider: str) -> str:
     resource_name = re.sub(r"\.", "_", zone.domain.removesuffix("."))
     resource_record_sets = list(
         filter(
-            lambda r: r.rectype == "SOA"
-            or (r.rectype == "NS" and r.name == zone.domain),
+            lambda r: not (
+                r.rectype == "SOA" or (r.rectype == "NS" and r.name == zone.domain)
+            ),
             create_from_zone(zone),
         )
     )
@@ -65,7 +66,7 @@ def convert_to_terraform(zone: easyzone.Zone, provider: str) -> str:
     "--provider",
     required=False,
     default="google",
-    help="name of provider to generate the managed zone for",
+    help="name of provider to generate the managed zone for (google)",
 )
 @click.argument("src", nargs=-1, type=click.Path())
 @click.argument("dst", nargs=1, type=click.Path())

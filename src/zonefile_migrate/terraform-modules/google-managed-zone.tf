@@ -3,8 +3,8 @@ variable domain_name {
   type        = string
 }
 
-variable dns_record_sets {
-  description = "DNS record sets in this domain"
+variable resource_record_sets {
+  description = "DNS resource record sets in this domain"
   type = list(object({
     name = string
     type = string
@@ -18,7 +18,7 @@ resource "google_dns_managed_zone" "managed_zone" {
 }
 
 resource "google_dns_record_set" "record" {
-  for_each     = {for r in var.dns_record_sets: format("%s-%s", r.name, r.type) => r}
+  for_each     = {for r in var.resource_record_sets: format("%s/%s", r.name, r.type) => r}
   name         = each.value.name
   managed_zone = google_dns_managed_zone.managed_zone.name
   type         = each.value.type
