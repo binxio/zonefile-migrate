@@ -12,6 +12,7 @@ variable resource_record_sets {
     rrdatas = list(string)
   }))
 }
+
 resource "google_dns_managed_zone" "managed_zone" {
   name     = replace(trimsuffix(var.domain_name, "."), "/\\./", "-")
   dns_name = var.domain_name
