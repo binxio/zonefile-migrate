@@ -82,7 +82,7 @@ def convert_to_cloudformation(zone: easyzone.Zone) -> dict:
                         r"^\*",
                         "wildcard",
                         record_set.name.removesuffix("." + zone.domain)
-                        if record_set.name == zone.domain
+                        if record_set.name != zone.domain
                         else "Origin",
                     )
                 ),
@@ -233,7 +233,7 @@ def command(sceptre_group, src, dst):
         with output.open("w") as file:
             YAML().dump(convert_to_cloudformation(zone), stream=file)
             if sceptre_group:
-                generate_sceptre_configuration(zone, outputs[i], sceptre_group)
+                generate_sceptre_configuration(zone, output, sceptre_group)
 
     convert_zonefiles(inputs, outputs, transform_to_cloudformation)
 
