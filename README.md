@@ -69,7 +69,7 @@ $ sceptre --var aws_profile=$AWS_PROFILE launch -y dns
 ```bash
 $ git clone   https://gitlab.com/binxio/zonefile-migrate.git
 $ cd zonefile-migrate/example
-$ zonefile-migrate to-terraform --provider google ./zones ./templates/dns
+$ zonefile-migrate to-terraform --provider google ./zones ./terraform
 INFO: reading zonefile zones/asample.org
 INFO: reading zonefile zones/land-5.com
 ```
@@ -77,6 +77,7 @@ INFO: reading zonefile zones/land-5.com
 To deploy all the managed zones to Google Cloud Platform, type:
 
 ```bash
+$ cd terraform 
 $ terraform init
 $ export GOOGLE_PROJECT=$(gcloud config get-value core/project)
 $ terraform apply -auto-approve
