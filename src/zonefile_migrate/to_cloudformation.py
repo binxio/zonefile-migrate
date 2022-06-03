@@ -50,7 +50,7 @@ def generate_unique_logical_resource_id(prefix: str, resources: dict) -> str:
     return f"{prefix}{count}"
 
 
-def convert_to_cloudformation(zone: easyzone.Zone) -> dict:
+def convert_to_cloudformation(zone: easyzone.Zone, maximum_ttl: int) -> dict:
     """
     Converts the zonefile into a CloudFormation template.
     """
@@ -99,7 +99,9 @@ def convert_to_cloudformation(zone: easyzone.Zone) -> dict:
                     "Name": record_set.name,
                     "Type": record_set.rectype,
                     "ResourceRecords": record_set.rrdatas,
-                    "TTL": record_set.ttl,
+                    "TTL": maximum_ttl
+                    if maximum_ttl and record_set.ttl > maximum_ttl
+                    else record_set.ttl,
                     "HostedZoneId": {"Ref": "HostedZone"},
                 },
             }
@@ -193,9 +195,15 @@ def generate_sceptre_configuration(
     type=click.Path(file_okay=False),
     help="to write sceptre stack group configuration",
 )
+@click.option(
+    "--maximum-ttl",
+    required=False,
+    type=int,
+    help="maximum TTL of domain name records",
+)
 @click.argument("src", nargs=-1, type=click.Path())
 @click.argument("dst", nargs=1, type=click.Path())
-def command(sceptre_group, src, dst):
+def command(sceptre_group, maximum_ttl, src, dst):
     """
     Converts one or more `SRC` zonefiles into AWS CloudFormation templates in `DST`.
     Optionally generates the Sceptre stack config for each of the templates in the
@@ -231,7 +239,7 @@ def command(sceptre_group, src, dst):
 
     def transform_to_cloudformation(zone: easyzone.Zone, output: Path):
         with output.open("w") as file:
-            YAML().dump(convert_to_cloudformation(zone), stream=file)
+            YAML().dump(convert_to_cloudformation(zone, maximum_ttl), stream=file)
             if sceptre_group:
                 generate_sceptre_configuration(zone, output, sceptre_group)
 

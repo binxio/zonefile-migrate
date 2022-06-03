@@ -25,7 +25,7 @@ module managed_zone_{{ resource_name }} {
     {
        name = "{{ record.name }}"
        type = "{{ record.rectype }}"
-       ttl  = {{ record.ttl }}
+       ttl  = {{ maximum_ttl if maximum_ttl and record.ttl > maximum_ttl else record.ttl }}
        rrdatas = [{% for rrdata in record.rrdatas %}
          "{{ rrdata.strip('"') }}",{% endfor %}
        ]
@@ -35,7 +35,7 @@ module managed_zone_{{ resource_name }} {
 """
 
 
-def convert_to_terraform(zone: easyzone.Zone, provider: str) -> str:
+def convert_to_terraform(zone: easyzone.Zone, provider: str, maximum_ttl: int) -> str:
     """
     Converts the zonefile into a terraform tempalte for Google
     """
@@ -56,6 +56,7 @@ def convert_to_terraform(zone: easyzone.Zone, provider: str) -> str:
             "domain_name": domain_name,
             "resource_name": resource_name,
             "provider": provider,
+            "maximum_ttl": maximum_ttl,
             "resource_record_sets": resource_record_sets,
         }
     )
@@ -68,9 +69,15 @@ def convert_to_terraform(zone: easyzone.Zone, provider: str) -> str:
     default="google",
     help="name of provider to generate the managed zone for (google)",
 )
+@click.option(
+    "--maximum-ttl",
+    required=False,
+    type=int,
+    help="maximum TTL of domain name records",
+)
 @click.argument("src", nargs=-1, type=click.Path())
 @click.argument("dst", nargs=1, type=click.Path())
-def command(provider, src, dst):
+def command(provider, maximum_ttl, src, dst):
     """
     Converts one or more `SRC` zonefiles into Terraform templates in `DST`.
 
@@ -115,7 +122,7 @@ def command(provider, src, dst):
 
     def _transform_to_terraform(zone: easyzone.Zone, output: Path):
         with output.open("w") as file:
-            file.write(convert_to_terraform(zone, provider))
+            file.write(convert_to_terraform(zone, provider, maximum_ttl))
 
     convert_zonefiles(inputs, outputs, _transform_to_terraform)
 
