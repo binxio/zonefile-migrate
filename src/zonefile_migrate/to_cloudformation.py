@@ -1,5 +1,6 @@
 import click
 import re
+from slugify import slugify
 
 from pathlib import Path
 from ruamel.yaml import YAML, CommentedMap
@@ -157,7 +158,7 @@ def generate_sceptre_configuration(
     generates a sceptre stack config for the CloudFormation template for the zone.
     """
     stack_name = "zone-" + re.sub(
-        r"-{2,}", "-", re.sub(r"[^\w]+", "-", zone.domain)
+        r"-{2,}", "-", re.sub(r"[^\w]+", "-", slugify(zone.domain))
     ).strip("-")
     stack_config = config_directory.joinpath(Path(stack_name).with_suffix(".yaml"))
 
