@@ -9,10 +9,12 @@ zonefile-migrate to-terraform [OPTIONS] [SRC]... DST
 # Options
 ```
 to-cloudformation
-  --sceptre-group DIRECTORY      to write sceptre stack group configuration
+  --sceptre-group DIRECTORY    to write sceptre stack group configuration
+  --maximum-ttl   INTEGER      maximum TTL of domain name records
   
 to-terraform
-  --provider PROVIDER            to generate for  
+  --maximum-ttl   INTEGER      maximum TTL of domain name records
+  --provider      PROVIDER     to generate for
 ```
 
 # Description

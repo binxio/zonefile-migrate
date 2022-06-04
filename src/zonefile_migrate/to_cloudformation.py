@@ -217,6 +217,8 @@ def command(sceptre_group, maximum_ttl, src, dst):
     The zonefiles must contain a $ORIGIN and $TTL statement. If the SRC points to a directory
     all files which contain one of these statements will be converted. If a $ORIGIN is missing,
     the name of the file will be used as the domain name.
+
+    You may override the maximum TTL of records through the option --maximum-ttl
     """
     if sceptre_group:
         sceptre_group = Path(sceptre_group)
