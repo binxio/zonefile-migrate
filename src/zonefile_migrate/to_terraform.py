@@ -40,11 +40,12 @@ def convert_to_terraform(zone: easyzone.Zone, provider: str, maximum_ttl: int) -
     Converts the zonefile into a terraform tempalte for Google
     """
     domain_name = zone.domain
+    idna_domain_name = domain_name.encode("idna").decode("ascii")
     resource_name = re.sub(r"\.", "_", zone.domain.removesuffix("."))
     resource_record_sets = list(
         filter(
             lambda r: not (
-                r.rectype == "SOA" or (r.rectype == "NS" and r.name == zone.domain)
+                r.rectype in ["SOA", "NS"] and r.name in [domain_name, idna_domain_name]
             ),
             create_from_zone(zone),
         )

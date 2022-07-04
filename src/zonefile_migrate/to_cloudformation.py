@@ -59,22 +59,21 @@ def convert_to_cloudformation(zone: easyzone.Zone, maximum_ttl: int) -> dict:
     """
     ttl = zone.root.ttl
     domain_name = zone.domain
+    idna_domain_name = domain_name.encode("idna").decode("ascii")
 
     result = CommentedMap()
     result["AWSTemplateFormatVersion"] = "2010-09-09"
     resources = CommentedMap()
     resources["HostedZone"] = CommentedMap(
-        {"Type": "AWS::Route53::HostedZone", "Properties": {"Name": zone.domain.encode("idna").decode("ascii")}}
+        {"Type": "AWS::Route53::HostedZone", "Properties": {"Name": idna_domain_name}}
     )
     result["Resources"] = resources
 
     for record_set in create_from_zone(zone):
-        if record_set.rectype == "NS" and record_set.name == zone.domain:
-            log.debug("ignoring NS records for origin %s", zone.domain)
-            continue
-        if record_set.rectype == "SOA":
-            log.debug("ignoring SOA records for domain %s", record_set.name)
-            continue
+        if record_set.name in [zone.domain, idna_domain_name]:
+            if record_set.rectype in ["NS", "SOA"]:
+                log.debug("ignoring %s records for origin %s", record_set.rectype, zone.domain)
+                continue
 
         logical_name = generate_unique_logical_resource_id(
             re.sub(
