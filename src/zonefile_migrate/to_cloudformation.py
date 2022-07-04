@@ -1,6 +1,8 @@
 import click
 import re
 from slugify import slugify
+from encodings import idna
+import encodings.idna
 
 from pathlib import Path
 from ruamel.yaml import YAML, CommentedMap
@@ -62,7 +64,7 @@ def convert_to_cloudformation(zone: easyzone.Zone, maximum_ttl: int) -> dict:
     result["AWSTemplateFormatVersion"] = "2010-09-09"
     resources = CommentedMap()
     resources["HostedZone"] = CommentedMap(
-        {"Type": "AWS::Route53::HostedZone", "Properties": {"Name": domain_name}}
+        {"Type": "AWS::Route53::HostedZone", "Properties": {"Name": zone.domain.encode("idna").decode("ascii")}}
     )
     result["Resources"] = resources
 

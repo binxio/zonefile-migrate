@@ -1,0 +1,5 @@
+$ORIGIN bönn.de.
+
+bönn.de.			      3600 IN SOA	ns81.domaincontrol.com root@bonn.de 2020081404 28800 7200 604800 600
+bönn.de.			      3600 IN NS	ns81.domaincontrol.com.
+bönn.de.			      3600 IN NS	ns82.domaincontrol.com.

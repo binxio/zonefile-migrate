@@ -20,7 +20,7 @@ from zonefile_migrate.utils import get_all_zonefiles_in_path
 tf_managed_zone_template = """
 module managed_zone_{{ resource_name }} {
   source               = "./{{ provider }}-managed-zone"
-  domain_name          = "{{ domain_name }}"
+  domain_name          = "{{ domain_name.encode("idna").decode("ascii") }}"
   resource_record_sets = [{% for record in resource_record_sets %}
     {
        name = "{{ record.name }}"

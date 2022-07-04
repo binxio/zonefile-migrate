@@ -18,8 +18,8 @@ to-terraform
 ```
 
 # Description
-Converts one or more `SRC` zonefiles into AWS CloudFormation or Terraform templates in
-`DST`. 
+Converts one or more `SRC` zonefiles into AWS CloudFormation 
+or Terraform templates in `DST`. 
 
 The zonefiles must contain a $ORIGIN and $TTL statement. If the SRC points
 to a directory all files which contain one of these statements will be
