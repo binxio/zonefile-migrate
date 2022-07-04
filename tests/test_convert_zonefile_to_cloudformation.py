@@ -56,7 +56,7 @@ class ConvertToCloudFormationTestCase(unittest.TestCase):
             self.zone = easyzone.zone_from_file("asample.org", filename.name)
 
     def test_something(self):
-        template = convert_to_cloudformation(self.zone)
+        template = convert_to_cloudformation(self.zone, 300)
         self.assertEqual("2010-09-09", template.get("AWSTemplateFormatVersion"))
         resources = template.get("Resources", {})
         self.assertTrue(resources, "Resources section exists")
